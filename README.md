@@ -7,9 +7,12 @@ Two langs will be supported by my, Java and Python, but it welcome for others.
 Roadmap:
 
 * Code navigation
- * super, this, self
  * ctags, cscops, global support
+ * super, this, self
+ * locals
 * File templates (or use another)
+ * apply for new files (default one, e.g. class)
+ * apply, update for existing
 * Code Hierarchy
  * types, methods 
  * goto child-types
