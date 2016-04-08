@@ -6,10 +6,13 @@ Two langs will be supported by my, Java and Python, but it welcome for others.
 
 Roadmap:
 
-1. Code navigation
+* Code navigation
  * super, this, self
  * ctags, cscops, global support
-2. File templates (or use another)
-3. Implement/Override super methods
-4. Code refactoring
+* File templates (or use another)
+* Code Hierarchy
+ * types, methods 
+ * goto child-types
+ * implement/override super methods
+* Code refactoring
  * Rename types, methods, fields, locals
