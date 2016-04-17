@@ -1,8 +1,5 @@
-Vim DE
+Open Development Enviroment Backend
 ---
-
-Yeap, I want to create a plugin, to be able to use NeoVim as an IDE.
-Two langs will be supported by my, Java and Python, but it welcome for others.
 
 Roadmap:
 
