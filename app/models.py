@@ -4,29 +4,35 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Sequence, Column, Integer, String
 from sqlalchemy.types import DateTime, Boolean
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relationship
 
-from utils import *
+from .app_utils import to_lower_camel_case
 
 Base = declarative_base()
+
 
 class BaseModel(object):
     id = Column(Integer, Sequence(__name__.lower() + '_id_seq'), primary_key=True)
 
     @declared_attr
     def __tablename__(self):
-        return toLowerCamelCase(self.__name__) + 's'
+        return to_lower_camel_case(self.__name__) + 's'
+
 
 class Project(BaseModel, Base):
     name = Column(String(50), nullable=False, unique=True)
     path = Column(String, nullable=False, unique=True)
 
+    def __init__(self):
+        self.id = 1
+
+
 class SourceSet(BaseModel, Base):
-    project_id = Column(Integer, ForeignKey(Project.id), nullable=False)
+    project_id = Column(Integer, ForeignKey(Project.id), nullable=False, default=1)
 
     name = Column(String(50), nullable=False)
     path = Column(String, nullable=False)
-    test = Column(Boolean, nullable=False)
+    test = Column(Boolean, nullable=False, default=False)
+
 
 class Package(BaseModel, Base):
     source_set_id = Column(Integer, ForeignKey(SourceSet.id), nullable=False)
@@ -34,8 +40,10 @@ class Package(BaseModel, Base):
 
     name = Column(String(50), nullable=False)
 
+
 class SourceKind(BaseModel, Base):
     name = Column(String(50), nullable=False)
+
 
 class Source(BaseModel, Base):
     source_set_id = Column(Integer, ForeignKey(SourceSet.id), nullable=False)
@@ -44,11 +52,14 @@ class Source(BaseModel, Base):
     path = Column(String, nullable=False)
     modified_ts = Column(DateTime, nullable=False)
 
+
 class TypeKind(BaseModel, Base):
     name = Column(String(50), nullable=False)
 
+
 class TypeVisibility(BaseModel, Base):
     name = Column(String(50), nullable=False)
+
 
 class Type(BaseModel, Base):
     source_id = Column(Integer, ForeignKey(Source.id), nullable=False)
@@ -65,8 +76,10 @@ class Type(BaseModel, Base):
     column_begin = Column(Integer, nullable=False)
     column_end = Column(Integer, nullable=False)
 
+
 class PropertyVisibility(BaseModel, Base):
     name = Column(String(50), nullable=False)
+
 
 class Property(BaseModel, Base):
     host_id = Column(Integer, ForeignKey(Type.id), nullable=False)
@@ -81,8 +94,10 @@ class Property(BaseModel, Base):
     column_begin = Column(Integer, nullable=False)
     column_end = Column(Integer, nullable=False)
 
+
 class FunctionVisibility(BaseModel, Base):
     name = Column(String(50), nullable=False)
+
 
 class Function(BaseModel, Base):
     host_id = Column(Integer, ForeignKey(Type.id), nullable=False)
@@ -97,4 +112,3 @@ class Function(BaseModel, Base):
     line_end = Column(Integer, nullable=False)
     column_begin = Column(Integer, nullable=False)
     column_end = Column(Integer, nullable=False)
-
