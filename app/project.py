@@ -4,7 +4,10 @@ from sqlalchemy.orm import sessionmaker
 
 from functools import wraps
 
-from .models import Base, Project
+from models import Base, Project, SourceSet
+from base import logger
+
+log = logger('project')
 
 
 def call_in_transaction(function=None, commit=True):
@@ -12,6 +15,13 @@ def call_in_transaction(function=None, commit=True):
     def decorator(fun):
         @wraps(fun)
         def wrapper(self, *args, **kwargs):
+            log.debug('call "%s" in a transaction', fun.__name__)
+
+            # direct invocation with session arg
+            if 'session' in kwargs:
+                log.debug('session passed, direct invocation', fun.__name__)
+                return fun(self, *args, **kwargs)
+
             s = self.session()
             kwargs['session'] = s
             try:
@@ -32,7 +42,7 @@ class OdebProject:
         self.session = sessionmaker(bind=self.engine)
 
     @call_in_transaction
-    def __add(self, element, session):
+    def _add(self, element, session):
         session.add(element)
 
     @call_in_transaction
@@ -41,10 +51,9 @@ class OdebProject:
         Base.metadata.create_all()
 
         p = Project()
-        p.id = 1
         p.name = name
         p.path = path
-        self.__add(p)
+        self._add(p, session=session)
 
     @call_in_transaction
     def delete(self, session):
@@ -56,6 +65,19 @@ class OdebProject:
         model = session.query(Project).filter(Project.id == 1).first()
         session.expunge(model)
         return model
+
+    @call_in_transaction(commit=False)
+    def get_source_sets(self, session):
+        sets = session.query(SourceSet).all()
+        session.expunge_all()
+        return sets
+
+    @call_in_transaction
+    def create_source_set(self, name, path, session):
+        ss = SourceSet()
+        ss.name = name
+        ss.path = path
+        self._add(ss, session=session)
 
 
 def get_project(engine_str):
