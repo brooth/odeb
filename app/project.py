@@ -4,22 +4,26 @@ from sqlalchemy.orm import sessionmaker
 
 from functools import wraps
 
-from models import Base, Project, SourceSet
-from base import logger
+from .models import Base, Project, SourceSet
+from .base import logger
 
-log = logger('project')
+
+log = logger()
 
 
 def call_in_transaction(function=None, commit=True):
-    """ Call in transaction decorator """
+    """ Call in transaction decorator
+    """
+
     def decorator(fun):
         @wraps(fun)
         def wrapper(self, *args, **kwargs):
-            log.debug('call "%s" in a transaction', fun.__name__)
+            log.debug('call "%s(args=%s, kwargs=%s)" in a transaction',
+                    fun.__name__, str(args), str(kwargs))
 
             # direct invocation with session arg
             if 'session' in kwargs:
-                log.debug('session passed, direct invocation', fun.__name__)
+                log.debug('session passed, direct invocation')
                 return fun(self, *args, **kwargs)
 
             s = self.session()
@@ -35,9 +39,11 @@ def call_in_transaction(function=None, commit=True):
 
 
 class OdebProject:
-    """ ODEB Project """
+    """ ODEB Project
+    """
 
     def __init__(self, engine_str):
+        log.debug('__init__(%s)' % engine_str)
         self.engine = create_engine(engine_str, echo=False)
         self.session = sessionmaker(bind=self.engine)
 

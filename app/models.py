@@ -5,7 +5,7 @@ from sqlalchemy import Sequence, Column, Integer, String
 from sqlalchemy.types import DateTime, Boolean
 from sqlalchemy.schema import ForeignKey
 
-from app_utils import to_lower_camel_case
+from .app_utils import to_lower_camel_case
 
 Base = declarative_base()
 
